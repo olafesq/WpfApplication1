@@ -11,53 +11,68 @@ namespace WpfApplication1
     /// </summary>
     public partial class MainWindow : Window{
 
-        MySerial mySerial;
+        MySerial mySerial;        
         FlowDocument mcFlowDoc = new FlowDocument();
+        App myApp = ((App)Application.Current);
         Paragraph para = new Paragraph();
         string inputData = string.Empty;
 
         public MainWindow()
         {
             InitializeComponent();
-
+            
             string[] ArrayComPortsNames = null;
             int index = -1;
             string ComPortName = null;
 
             ArrayComPortsNames = SerialPort.GetPortNames();
-            
+
+            comboBox.Items.Add("KvaserCAN");            
+
             do
             {
                 index += 1;
                 comboBox.Items.Add(ArrayComPortsNames[index]);
-            }
-
-            while (!((ArrayComPortsNames[index] == ComPortName) ||
+            } while (!((ArrayComPortsNames[index] == ComPortName) ||
                                 (index == ArrayComPortsNames.GetUpperBound(0))));
 
-            Array.Sort(ArrayComPortsNames);
+            //Array.Sort(ArrayComPortsNames);
 
             //want to get first out
-            if (index == ArrayComPortsNames.GetUpperBound(0))
-            {
-                ComPortName = ArrayComPortsNames[0];
-            }
-            comboBox.Text = ArrayComPortsNames[0];
+            //if (index == ArrayComPortsNames.GetUpperBound(0))
+            //{
+            //    ComPortName = ArrayComPortsNames[0];
+            //}
+            //comboBox.Text = ArrayComPortsNames[0];
+            comboBox.Text = comboBox.Items.GetItemAt(0).ToString();
         }
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
-            if ((string)button.Content == "Connect")
-            {
-                string portName = comboBox.SelectedValue.ToString();
-                mySerial = new MySerial(portName);                
-                richTextBox.Focus();
+            string portName = comboBox.SelectedValue.ToString();
 
-                if (mySerial.myComPort.IsOpen) this.button.Content = "Disconnect";
+            if ((string)button.Content == "Connect")
+            {                
+                if (portName == "KvaserCAN")
+                {
+                    myApp.initCan(); //intention is to start it in different thread then UI
+                    if (myApp.getCanOK()) this.button.Content = "Disconnect";
+                    else intoTerminal("Ei õnnestunud");
+                }
+                else
+                {
+                    mySerial = new MySerial(portName);
+                    if (mySerial.myComPort.IsOpen) this.button.Content = "Disconnect";
+                    else intoTerminal("Ei õnnestunud");
+                }
+                                  
+                richTextBox.Focus();               
             }
             else
             {
-                mySerial.myComPort.Close();
+                if(portName == "KvaserCAN") myApp.deinitCan();
+                else mySerial.myComPort.Close();
+               
                 intoTerminal("Disconnected!");
                 this.button.Content = "Connect";
 
