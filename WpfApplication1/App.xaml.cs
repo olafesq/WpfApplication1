@@ -10,29 +10,34 @@ namespace WpfApplication1
     {
 
         KvaserCAN kcan;
+        MainWindow wnd;
 
         public void initCan() {
             kcan = new KvaserCAN(this);
         }
 
-        public void deinitCan() {
-            kcan.deinitCan();
+        public bool checkRunCan() {
+                return wnd.runCan;          
         }
 
         public bool getCanOK()
         {
-            if(kcan.status==0) return true;
+            if(kcan.hcan>=0) return true;
             return false;
         }
 
         public void send2Terminal(string tekst)
         {
             App.Current.Dispatcher.Invoke(() => //UI has separate thread
-            {
-                MainWindow wnd = (MainWindow)Application.Current.MainWindow;
+            {                
                 wnd.intoTerminal(tekst);
             });
         } 
+
+        public void setMainW()
+        {
+            wnd = (MainWindow)Application.Current.MainWindow;
+        }
 
 
     }

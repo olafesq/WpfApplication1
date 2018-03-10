@@ -16,14 +16,19 @@ namespace WpfApplication1
         App myApp = ((App)Application.Current);
         Paragraph para = new Paragraph();
         string inputData = string.Empty;
+        string portName;
+        public bool runCan = false;
 
         public MainWindow()
         {
             InitializeComponent();
-            
+
+            myApp.setMainW();
+
             string[] ArrayComPortsNames = null;
             int index = -1;
             string ComPortName = null;
+            
 
             ArrayComPortsNames = SerialPort.GetPortNames();
 
@@ -49,15 +54,20 @@ namespace WpfApplication1
 
         private void button_Click(object sender, RoutedEventArgs e)
         {
-            string portName = comboBox.SelectedValue.ToString();
+            
 
             if ((string)button.Content == "Connect")
-            {                
+            {
+                portName = comboBox.SelectedValue.ToString();
                 if (portName == "KvaserCAN")
                 {
                     myApp.initCan(); //intention is to start it in different thread then UI
-                    if (myApp.getCanOK()) this.button.Content = "Disconnect";
-                    else intoTerminal("Ei õnnestunud");
+                    if (myApp.getCanOK())
+                    {
+                        this.button.Content = "Disconnect";
+                        runCan = true;
+                    }
+                    else intoTerminal("Kvaserit ei ole ühendatud");
                 }
                 else
                 {
@@ -70,12 +80,17 @@ namespace WpfApplication1
             }
             else
             {
-                if(portName == "KvaserCAN") myApp.deinitCan();
-                else mySerial.myComPort.Close();
-               
-                intoTerminal("Disconnected!");
-                this.button.Content = "Connect";
-
+                try
+                {
+                    if (portName == "KvaserCAN") runCan = false;
+                    else mySerial.myComPort.Close();
+                    intoTerminal(portName +" Disconnected!");
+                    button.Content = "Connect";
+                }
+                catch (NullReferenceException)
+                {
+                    intoTerminal(portName + " pole ühendatud");
+                }
             }     
         }
 

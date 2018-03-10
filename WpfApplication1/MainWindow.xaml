@@ -8,7 +8,7 @@
         Title="MainWindow" Height="350" Width="525">
     <Grid>
         <Button x:Name="button" Content="Connect" HorizontalAlignment="Left" Margin="45,95,0,0" VerticalAlignment="Top" Width="85" Click="button_Click"/>
-        <RichTextBox x:Name="richTextBox" HorizontalAlignment="Left" Height="210" Margin="140,40,0,0" VerticalAlignment="Top" Width="355" KeyDown="Data2Send" AcceptsReturn="False" FontFamily="Consolas" BorderThickness="0" >
+        <RichTextBox x:Name="richTextBox" HorizontalAlignment="Left" Height="210" Margin="140,40,0,0" VerticalAlignment="Top" Width="355" KeyDown="Data2Send" AcceptsReturn="False" FontFamily="Consolas" BorderThickness="0" Block.TextAlignment="Center" >
             <FlowDocument IsColumnWidthFlexible="False">
                 <Paragraph>
                     <Run Text="Formula Student Estonia Firmware tool"/>
