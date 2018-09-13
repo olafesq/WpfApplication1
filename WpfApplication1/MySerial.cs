@@ -3,7 +3,7 @@ using System.IO;
 using System.IO.Ports;
 using System.Windows;
 
-namespace WpfApplication1
+namespace FSFWTool
 {
     class MySerial
     {
@@ -43,7 +43,7 @@ namespace WpfApplication1
         {
             // Collecting the characters received to our 'buffer' (string).
             string recieved_data = myComPort.ReadLine();           
-            App.Current.Dispatcher.Invoke(() =>
+            Application.Current.Dispatcher.Invoke(() =>
             {
                 MainWindow wnd = (MainWindow)Application.Current.MainWindow;
                 wnd.intoTerminal(recieved_data);

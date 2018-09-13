@@ -1,22 +1,24 @@
-﻿<Window x:Class="WpfApplication1.MainWindow"
+﻿<Window x:Class="FSFWTool.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:WpfApplication1"
+        xmlns:local="clr-namespace:FSFWTool"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
+        Title="FSFWTool" Height="350" Width="525">
+    <Grid Background="WhiteSmoke">
         <Button x:Name="button" Content="Connect" HorizontalAlignment="Left" Margin="45,95,0,0" VerticalAlignment="Top" Width="85" Click="button_Click"/>
-        <RichTextBox x:Name="richTextBox" HorizontalAlignment="Left" Height="210" Margin="140,40,0,0" VerticalAlignment="Top" Width="355" KeyDown="Data2Send" AcceptsReturn="False" FontFamily="Consolas" BorderThickness="0" Block.TextAlignment="Center" >
+        <RichTextBox TextElement.Foreground="LightSeaGreen" x:Name="richTextBox" HorizontalAlignment="Left" Height="210" Margin="140,40,0,0" VerticalAlignment="Top" Width="355" KeyDown="Data2Send" AcceptsReturn="False" FontFamily="Consolas" BorderThickness="0" Block.TextAlignment="Left" Background="{x:Null}" >
             <FlowDocument IsColumnWidthFlexible="False">
                 <Paragraph>
                     <Run Text="Formula Student Estonia Firmware tool"/>
                 </Paragraph>
             </FlowDocument>
         </RichTextBox>
-        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="45,60,0,0" VerticalAlignment="Top" Width="85" />
-        <Button x:Name="bProgram" Content="Program FW" HorizontalAlignment="Left" Margin="45,130,0,0" VerticalAlignment="Top" Width="85" Click="bProgram_Click"/>
+        <ComboBox x:Name="comboBox" HorizontalAlignment="Left" Margin="45,60,0,0" VerticalAlignment="Top" Width="85" Opacity="0.8"   />
+        <Button x:Name="bProgram" Content="Program Flash" HorizontalAlignment="Left" Margin="45,160,0,0" VerticalAlignment="Top" Width="85" Click="bProgram_Click" Background="#FFDA1B1B"/>
+        <Button x:Name="bReadFl" Content="Read Flash" HorizontalAlignment="Left" Margin="45,190,0,0" VerticalAlignment="Top" Width="85" Click="bReadF_Click" Background="#FF15CB15"/>
+        <Button x:Name="bEraseFl" Content="Erase Flash" HorizontalAlignment="Left" Margin="45,220,0,0" VerticalAlignment="Top" Width="85" Click="bEraseF_Click" Background="#FFDA1B1B"/>
 
     </Grid>
 </Window>

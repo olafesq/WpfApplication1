@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO.Ports;
+using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 
-namespace WpfApplication1
+namespace FSFWTool
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -13,17 +14,22 @@ namespace WpfApplication1
 
         MySerial mySerial;        
         FlowDocument mcFlowDoc = new FlowDocument();
-        App myApp = ((App)Application.Current);
+        //App myApp = ((App)Application.Current);
         Paragraph para = new Paragraph();
+
+        KvaserCAN kvaser;
+        //MainWindow wnd = (MainWindow)Application.Current.MainWindow;
+        public static readonly object _locker = new object();
+
         string inputData = string.Empty;
         string portName;
-        public bool runCan = false;
+        public volatile bool runCan = false;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            myApp.setMainW();
+            //myApp.setMainW();
 
             string[] ArrayComPortsNames = null;
             int index = -1;
@@ -61,13 +67,11 @@ namespace WpfApplication1
                 portName = comboBox.SelectedValue.ToString();
                 if (portName == "KvaserCAN")
                 {
-                    myApp.initCan(); //intention is to start it in different thread then UI
-                    if (myApp.getCanOK())
-                    {
-                        this.button.Content = "Disconnect";
-                        runCan = true;
-                    }
-                    else intoTerminal("Kvaserit ei ole ühendatud");
+                    kvaser = new KvaserCAN(this);
+                    
+                    startCanMsgDump();
+                                   
+                    this.button.Content = "Disconnect";
                 }
                 else
                 {
@@ -82,7 +86,11 @@ namespace WpfApplication1
             {
                 try
                 {
-                    if (portName == "KvaserCAN") runCan = false;
+                    if (portName == "KvaserCAN")
+                    {
+                        lock(_locker) runCan = false;
+                        kvaser.deinitCan();                   
+                    }
                     else mySerial.myComPort.Close();
                     intoTerminal(portName +" Disconnected!");
                     button.Content = "Connect";
@@ -101,7 +109,7 @@ namespace WpfApplication1
             mcFlowDoc.Blocks.Add(para);
             richTextBox.Document = mcFlowDoc;
             richTextBox.CaretPosition = richTextBox.Document.ContentEnd;            
-            richTextBox.ScrollToEnd();
+            //richTextBox.ScrollToEnd();
         }
 
         private void Data2Send(object sender, System.Windows.Input.KeyEventArgs e)
@@ -125,9 +133,52 @@ namespace WpfApplication1
             }
         }
 
-        private void bProgram_Click(object sender, RoutedEventArgs e)
+        void startCanMsgDump()
         {
-            mySerial.FWSend();
+            lock (_locker) runCan = true;
+            Thread t1 = new Thread(() => this.kvaser.DumpMessageLoop());
+            t1.Start();
+        }
+
+         private void bProgram_Click(object sender, RoutedEventArgs e)
+        {
+            if (runCan)
+            {
+                //lock (_locker) runCan = false; //stops msgDump
+
+                Thread fwth = new Thread(() =>
+                {
+                    KvaserCAN kvaserB = new KvaserCAN(this);
+                    kvaserB.FWSend();
+                });
+                fwth.Start();
+                           
+            }
+            else mySerial.FWSend();
+        }
+
+        private void bEraseF_Click(object sender, RoutedEventArgs e)
+        {
+            if (runCan)
+            {
+                lock (_locker) runCan = false; //stops msgDump
+
+                Thread fwth = new Thread(kvaser.EraseFl);
+                fwth.Start();
+
+            }
+        }
+
+        private void bReadF_Click(object sender, RoutedEventArgs e)
+        {
+            if (runCan)
+            {
+                lock (_locker) runCan = false; //stops msgDump
+
+                Thread fwth = new Thread(kvaser.ReadFl);
+                fwth.Start();
+
+            }
         }
     }
 }
